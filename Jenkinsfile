@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('* * * * *')   // ← ADD IT HERE
+    }
 
     environment {
         AWS_REGION      = 'ap-southeast-2'
@@ -37,6 +40,26 @@ pipeline {
                 """
             }
         }
+    stage('Push to ECR') {
+    steps {
+        withCredentials([
+            string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
+            sh """
+                export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                export AWS_DEFAULT_REGION=${AWS_REGION}
+
+                aws ecr get-login-password --region ${AWS_REGION} | \
+                docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+                docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
+                docker push ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
+            """
+             }
+         }
+    }
 
     }
 
