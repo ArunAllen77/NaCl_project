@@ -50,14 +50,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh """
-                     cd /var/jenkins_home/workspace/${JOB_NAME}
-            
-                    docker-compose -f mongo.yaml down node-app
-            
-                    docker pull ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
-            
-                IMAGE=${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} docker-compose -f mongo.yaml up -d
-                """
+                 cd /var/jenkins_home/workspace/${JOB_NAME}
+
+                 docker compose -f mongo.yaml down node-app
+
+                docker pull ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
+
+                 IMAGE=${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} docker compose -f mongo.yaml up -d
+             """
             }
         }
 
