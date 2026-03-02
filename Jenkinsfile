@@ -28,7 +28,7 @@ pipeline {
             }
         }
 
-        stage('Push to ECR') {
+        stage('Build Docker Image') {
             steps {
                 sh """
                     aws ecr get-login-password --region ${AWS_REGION} | \
